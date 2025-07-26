@@ -7,7 +7,7 @@ use crate::archivefiles::ArchiveError;
 
 /// VIVO锁屏打包工具
 #[derive(Parser, Debug)]
-#[command(author = "开发者", version = "1.0", about = "用于打包锁屏主题的工具")]
+#[command(author = "mdjso", version = "1.1", about = "用于打包锁屏主题的工具")]
 pub struct Args {
     /// 输入的锁屏目录路径（必须包含 preview、description.xml、manifest.xml）
     #[arg(value_name = "输入路径")]
