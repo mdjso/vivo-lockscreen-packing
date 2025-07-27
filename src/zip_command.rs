@@ -34,7 +34,11 @@ impl ZipCommand {
         // find zip in exec program's parent path
         if let Ok(exec_path) = std::env::current_exe() {
             if let Some(parent) = exec_path.parent() {
+                #[cfg(windows)]
+                let candidate = parent.join("zip.exe");
+                #[cfg(not(windows))]
                 let candidate = parent.join("zip");
+
                 if candidate.exists() {
                     return Ok(Self { path: candidate });
                 }

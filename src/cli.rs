@@ -24,21 +24,23 @@ pub struct Args {
 
 impl Args {
     pub fn validate_input(&self) -> io::Result<()> {
-        let required = [
-            "preview",
-            "description.xml",
-            "lockscreen",
-            "lockscreen/manifest.xml",
-        ];
+        let required = ["preview", "description.xml", "lockscreen/manifest.xml"];
+        let mut missing = Vec::new();
+
         for entry in &required {
             let path = self.input_path.join(entry);
             if !path.exists() {
-                return Err(io::Error::new(
-                    io::ErrorKind::NotFound,
-                    format!("锁屏包缺少必要文件: {entry}"),
-                ));
+                missing.push(entry.to_string());
             }
         }
+
+        if !missing.is_empty() {
+            return Err(io::Error::new(
+                io::ErrorKind::NotFound,
+                format!("锁屏包缺少以下必要文件: {}", missing.join(", ")),
+            ));
+        }
+
         Ok(())
     }
 
