@@ -31,6 +31,21 @@ impl ArchiveFiles {
 
         Ok(())
     }
+
+    pub fn zip_and_rename<P: AsRef<Path>>(
+        &self,
+        zip_command: &ZipCommand,
+        to: P,
+    ) -> Result<(), ArchiveError> {
+        let zip_to = to.as_ref().with_extension("zip");
+        self.zip_with(zip_command, &zip_to)?;
+
+        std::fs::rename(&zip_to, &to).inspect_err(|_| {
+            let _ = std::fs::remove_file(&zip_to);
+        })?;
+
+        Ok(())
+    }
 }
 
 #[derive(Debug, PartialEq)]
@@ -155,6 +170,20 @@ impl ArchiveFile {
                 }
             }
         }
+
+        Ok(())
+    }
+    pub fn zip_and_rename<P: AsRef<Path>>(
+        &self,
+        zip_command: &ZipCommand,
+        to: P,
+    ) -> Result<(), ArchiveError> {
+        let zip_to = to.as_ref().with_extension("zip");
+        self.zip_with(zip_command, &zip_to)?;
+
+        std::fs::rename(&zip_to, &to).inspect_err(|_| {
+            let _ = std::fs::remove_file(&zip_to);
+        })?;
 
         Ok(())
     }
