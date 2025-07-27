@@ -1,7 +1,11 @@
 [package]
 name = "vivo-lockscreen-packing"
-version = "0.1.1"
+version = "0.1.2"
 edition = "2024"
+
+[[bin]]
+name = "vlp"
+path = "src/main.rs"
 
 [dependencies]
 chrono = "0.4.41"

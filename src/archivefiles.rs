@@ -22,7 +22,7 @@ impl ArchiveFiles {
         let tmp_dir = TempDir::new()?;
         let staging_root = tmp_dir.path();
 
-        // creat directory structure in tem dir
+        // creat directory structure in temporary dir
         for file in &self.files {
             file.copy_to(staging_root)?
         }
@@ -127,7 +127,10 @@ impl ArchiveFile {
             dir_path.as_ref().join(pos)
         } else {
             dir_path.as_ref().join(self.path.file_name().ok_or_else(|| {
-                ArchiveError::InvalidPath(io::Error::new(io::ErrorKind::InvalidInput, "文件名为空"))
+                ArchiveError::InvalidPath(io::Error::new(
+                    io::ErrorKind::InvalidInput,
+                    format!("文件名为空: {:?}", self.path),
+                ))
             })?)
         };
 
@@ -136,7 +139,7 @@ impl ArchiveFile {
             FileType::Dir => self.copy_dir_to(&target_path),
             FileType::Other => Err(ArchiveError::InvalidPath(io::Error::new(
                 io::ErrorKind::InvalidInput,
-                format!("Unsupported file type: {:?}", self.path),
+                format!("不支持的文件类型:: {:?}", self.path),
             ))),
         }
     }
@@ -198,8 +201,8 @@ pub enum ArchiveError {
 impl std::fmt::Display for ArchiveError {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            ArchiveError::InvalidPath(path) => write!(f, "Invalid path: {path}"),
-            ArchiveError::Io(e) => write!(f, "IO error: {e}"),
+            ArchiveError::InvalidPath(path) => write!(f, "{path}"),
+            ArchiveError::Io(e) => write!(f, "{e}"),
         }
     }
 }

@@ -86,11 +86,8 @@ impl ZipCommand {
     }
     pub fn report_error(&self, output: &std::process::Output) -> io::Result<()> {
         if !output.status.success() {
-            let stderr = String::from_utf8_lossy(&output.stderr);
             let stdout = String::from_utf8_lossy(&output.stdout);
-            return Err(io::Error::other(format!(
-                "zip 命令执行失败: \nstderr:{stderr}\nstdio:{stdout}"
-            )));
+            return Err(io::Error::other(format!("zip 命令执行失败: \n{stdout}")));
         }
         Ok(())
     }

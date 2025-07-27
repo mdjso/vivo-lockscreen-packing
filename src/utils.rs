@@ -1,4 +1,5 @@
 use std::fs;
+use std::io::Write;
 use std::{io, path::Path};
 
 use chrono::Local;
@@ -25,6 +26,12 @@ pub fn deal_dscr_xml<P: AsRef<Path>>(description_file: P, new_number: &str) -> i
 
     fs::write(path, updated)?;
     Ok(())
+}
+
+pub fn pause_before_exit() {
+    eprint!("按回车键退出...");
+    let _ = std::io::stdout().flush();
+    let _ = std::io::stdin().read_line(&mut String::new());
 }
 
 fn replace_id_and_title(content: &str, new_number: &str) -> Option<String> {

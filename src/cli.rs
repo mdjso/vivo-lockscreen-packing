@@ -35,7 +35,7 @@ impl Args {
             if !path.exists() {
                 return Err(io::Error::new(
                     io::ErrorKind::NotFound,
-                    format!("缺少必要文件: {entry}"),
+                    format!("锁屏包缺少必要文件: {entry}"),
                 ));
             }
         }
