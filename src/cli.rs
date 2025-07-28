@@ -9,26 +9,41 @@ use crate::archivefiles::ArchiveError;
 #[derive(Parser, Debug)]
 #[command(author = "mdjso", version = "1.1", about = "用于打包锁屏主题的工具")]
 pub struct Args {
-    /// 输入的锁屏目录路径（必须包含 preview、description.xml、manifest.xml）
-    #[arg(value_name = "输入路径")]
-    pub input_path: std::path::PathBuf,
+    /// 锁屏包路径（必须包含 preview、description.xml、lockscreen/manifest.xml）
+    #[arg(value_name = "输入目录", value_hint = clap::ValueHint::DirPath)]
+    pub input_path: Option<PathBuf>,
 
-    /// 指定 zip 可执行文件路径（可选）
-    #[arg(short, long, help = "zip 可执行文件路径")]
-    pub zip_path: Option<std::path::PathBuf>,
+    /// 执行注册功能
+    #[arg(long, help = "注册右键菜单项")]
+    pub register: bool,
 
-    /// 输出目录（默认为输入路径的上一级）
-    #[arg(short, long, help = "输出目录路径")]
-    pub output: Option<std::path::PathBuf>,
+    /// 执行注册功能
+    #[arg(long, help = "取消注册右键菜单项")]
+    pub unregister: bool,
+
+    /// 指定 zip 可执行文件路径
+    #[arg(short, long, value_name = "ZIP可执行文件", value_hint = clap::ValueHint::FilePath)]
+    pub zip_path: Option<PathBuf>,
+
+    /// 输出目录路径（默认为输入路径的上一级目录）
+    #[arg(short, long, value_name = "输出目录", value_hint = clap::ValueHint::DirPath)]
+    pub output: Option<PathBuf>,
 }
 
 impl Args {
     pub fn validate_input(&self) -> io::Result<()> {
+        let input_path = self.input_path.as_ref().ok_or_else(|| {
+            io::Error::new(
+                io::ErrorKind::InvalidInput,
+                "未提供输入路径，无法验证锁屏包",
+            )
+        })?;
+
         let required = ["preview", "description.xml", "lockscreen/manifest.xml"];
         let mut missing = Vec::new();
 
         for entry in &required {
-            let path = self.input_path.join(entry);
+            let path = input_path.join(entry);
             if !path.exists() {
                 missing.push(entry.to_string());
             }
@@ -49,7 +64,14 @@ impl Args {
             return Ok(output.clone());
         }
 
-        if let Some(parent) = self.input_path.parent() {
+        let input_path = self.input_path.as_ref().ok_or_else(|| {
+            ArchiveError::InvalidPath(io::Error::new(
+                io::ErrorKind::InvalidInput,
+                "未提供输入路径，无法推导输出目录",
+            ))
+        })?;
+
+        if let Some(parent) = input_path.parent() {
             return Ok(parent.to_path_buf());
         }
 
