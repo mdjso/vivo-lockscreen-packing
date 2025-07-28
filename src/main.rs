@@ -40,15 +40,8 @@ fn run() -> Result<(), ArchiveError> {
 
     args.validate_input()?;
 
-    let input_path = args.input_path.as_ref().ok_or_else(|| {
-        ArchiveError::InvalidPath(std::io::Error::new(
-            std::io::ErrorKind::InvalidInput,
-            "未提供输入路径",
-        ))
-    })?;
-
     process_lockscreen_package(
-        input_path,
+        args.get_input_path()?,
         &args.resolved_output_dir()?,
         ZipCommand::resolve(args.zip_path.as_deref())?,
     )?;
